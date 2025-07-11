@@ -8,8 +8,8 @@ app = Flask(__name__)
 CORS(app)
 
 # 🔐 Replace with your Supabase values
-SUPABASE_URL = "https://your-project.supabase.co"
-SUPABASE_KEY = "your-anon-key"
+SUPABASE_URL = "https://rdwucvlksaqsajawyhrf.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkd3Vjdmxrc2Fxc2FqYXd5aHJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyNTIyNDAsImV4cCI6MjA2NzgyODI0MH0.t-oQb-8u0pOGy9V6L4seNcuG52z8UwJ3d2IZhkkWCUI"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 AUTHORIZED_DEVICES = {"esp32_1", "esp32_2", "esp32_alpha"}
