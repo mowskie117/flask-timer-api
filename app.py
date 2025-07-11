@@ -26,23 +26,24 @@ def set_timer():
 
     if not device_id or seconds is None:
         return jsonify({"error": "Missing data"}), 400
-    if device_id not in AUTHORIZED_DEVICES:
+
+    # 🔐 Check Supabase for valid device
+    result = supabase.table("authorized_devices").select("device_id").eq("device_id", device_id).execute()
+    if not result.data:
         return jsonify({"error": "Unauthorized device ID"}), 403
 
     now = datetime.utcnow().isoformat()
 
-    # Check if device already exists
-    result = supabase.table("timers").select("device_id").eq("device_id", device_id).execute()
+    # Set or update timer in timers table
+    timer_check = supabase.table("timers").select("device_id").eq("device_id", device_id).execute()
 
-    if result.data:
-        # Update existing timer
+    if timer_check.data:
         supabase.table("timers").update({
             "seconds": seconds,
             "status": "pending",
             "set_time": now
         }).eq("device_id", device_id).execute()
     else:
-        # Insert new timer
         supabase.table("timers").insert({
             "device_id": device_id,
             "seconds": seconds,
