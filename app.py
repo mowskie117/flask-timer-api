@@ -9,7 +9,7 @@ CORS(app)
 
 # Supabase config
 SUPABASE_URL = "https://nbxfieyuphlserxjylja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  # You can keep it for now
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ieGZpZXl1cGhsc2VyeGp5bGphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwOTQ3NTcsImV4cCI6MjA2ODY3MDc1N30.kvR709TEs-Ixp48DWhow4539qHrax6YCnu2DF3a0DQ8"  # You can keep it for now
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 AUTHORIZED_DEVICES = {"esp32_1", "esp32_2", "esp32_alpha"}
