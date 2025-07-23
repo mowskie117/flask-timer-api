@@ -7,9 +7,9 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# 🔐 Replace with your Supabase values
+# Supabase config
 SUPABASE_URL = "https://nbxfieyuphlserxjylja.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ieGZpZXl1cGhsc2VyeGp5bGphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwOTQ3NTcsImV4cCI6MjA2ODY3MDc1N30.kvR709TEs-Ixp48DWhow4539qHrax6YCnu2DF3a0DQ8"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  # You can keep it for now
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 AUTHORIZED_DEVICES = {"esp32_1", "esp32_2", "esp32_alpha"}
@@ -22,31 +22,31 @@ def home():
 def set_timer():
     data = request.get_json()
     device_id = data.get('device_id')
-    seconds = data.get('seconds')
+    target_time = data.get('target_time')  # ISO 8601 timestamp string
 
-    if not device_id or seconds is None:
-        return jsonify({"error": "Missing data"}), 400
+    if not device_id or not target_time:
+        return jsonify({"error": "Missing device_id or target_time"}), 400
 
-    # 🔐 Check Supabase for valid device
+    # Check Supabase if device is authorized
     result = supabase.table("authorized_devices").select("device_id").eq("device_id", device_id).execute()
     if not result.data:
         return jsonify({"error": "Unauthorized device ID"}), 403
 
     now = datetime.utcnow().isoformat()
 
-    # Set or update timer in timers table
-    timer_check = supabase.table("timers").select("device_id").eq("device_id", device_id).execute()
+    # Insert or update timer
+    timer_check = supabase.table("timers").select("*").eq("device_id", device_id).execute()
 
     if timer_check.data:
         supabase.table("timers").update({
-            "seconds": seconds,
+            "target_time": target_time,
             "status": "pending",
             "set_time": now
         }).eq("device_id", device_id).execute()
     else:
         supabase.table("timers").insert({
             "device_id": device_id,
-            "seconds": seconds,
+            "target_time": target_time,
             "status": "pending",
             "set_time": now
         }).execute()
@@ -66,12 +66,12 @@ def get_timer():
     timer = result.data[0] if result.data else None
 
     if not timer or timer['status'] != "pending":
-        return jsonify({"seconds": None}), 200
+        return jsonify({"target_time": None}), 200
 
     # Mark as used
     supabase.table("timers").update({"status": "used"}).eq("device_id", device_id).execute()
 
-    return jsonify({"seconds": timer['seconds']}), 200
+    return jsonify({"target_time": timer['target_time']}), 200
 
 if __name__ == '__main__':
     app.run()
