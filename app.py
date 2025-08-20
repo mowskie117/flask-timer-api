@@ -32,7 +32,7 @@ def set_timer():
     if not result.data:
         return jsonify({"error": "Unauthorized device ID"}), 403
 
-    now = datetime.utcnow().isoformat()
+    now = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
     # Insert or update timer
     timer_check = supabase.table("timers").select("*").eq("device_id", device_id).execute()
